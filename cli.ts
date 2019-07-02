@@ -6,6 +6,7 @@ import { buildHelpMessage, buildVersionMessage } from "vs/platform/environment/n
 import product from "vs/platform/product/node/product";
 import pkg from "vs/platform/product/node/package";
 import { MainServer, WebviewServer } from "vs/server/server";
+import "vs/server/tar";
 
 interface IMainCli {
 	main: (argv: ParsedArgs) => Promise<void>;
@@ -13,6 +14,15 @@ interface IMainCli {
 
 const main = async (): Promise<void> => {
 	const args = validatePaths(parseMainProcessArgv(process.argv));
+
+	if (!product.extensionsGallery) {
+		product.extensionsGallery = {
+			serviceUrl: process.env.SERVICE_URL || "https://v1.extapi.coder.com",
+			itemUrl: process.env.ITEM_URL || "",
+			controlUrl: "",
+			recommendationsUrl: "",
+		};
+	}
 
 	if (args.help) {
 		const executable = `${product.applicationName}${os.platform() === "win32" ? ".exe" : ""}`;
